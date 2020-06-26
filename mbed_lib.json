@@ -1,0 +1,52 @@
+{
+    "name": "vznncv-mbed-littelfs",
+    "macros": [
+        "VZNNCV_LFS_CONFIG=vznncv_mbed_lfs_config.h"
+    ],
+    "config": {
+        "default_block_size": {
+            "value": 512,
+            "help": "Default mininal littlefs block size. See littlefs documentation for more details."
+        },
+        "default_block_cycles": {
+            "value": 1024,
+            "help": "Default littlefs erase cycle. See littlefs documentation for more details."
+        },
+        "default_cache_size": {
+            "value": 64,
+            "help": "Default minimal littlefs read/program caches. See littlefs documentation for more details."
+        },
+        "default_lookahead_size": {
+            "value": 64,
+            "help": "Default littlefs lookahead size. See littlefs documentation for more details."
+        },
+        "intrinsics": {
+            "value": true,
+            "help": "Enable intrinsics for bit operations such as ctz, popc, and le32 conversion. Can be disabled to help debug toolchain issues"
+        },
+        "use_mbed_trace": {
+            "value": true,
+            "help": "Use mbed_trace module for log messages if it's true, otherwise use fprintf"
+        },
+        "enable_trace": {
+            "value": false,
+            "help": "Enables verbose tracing messages, true = enabled, false = disabled, null = disabled only in release builds"
+        },
+        "enable_debug": {
+            "value": null,
+            "help": "Enables debug logging, true = enabled, false = disabled, null = disabled only in release builds"
+        },
+        "enable_warn": {
+            "value": null,
+            "help": "Enables warn logging, true = enabled, false = disabled, null = disabled only in release builds"
+        },
+        "enable_error": {
+            "value": null,
+            "help": "Enables error logging, true = enabled, false = disabled, null = disabled only in release builds"
+        },
+        "enable_assert": {
+            "value": null,
+            "help": "Enables asserts, true = enabled, false = disabled, null = disabled only in release builds"
+        }
+    }
+}
