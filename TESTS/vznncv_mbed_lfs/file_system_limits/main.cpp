@@ -1,7 +1,6 @@
 #include "greentea-client/test_env.h"
 #include "mbed.h"
 #include "mbed_mem_trace.h"
-#include "pathutil.h"
 #include "unity.h"
 #include "utest.h"
 #include <memory>
@@ -13,7 +12,6 @@
 using std::make_unique;
 
 using namespace utest::v1;
-using namespace pathutil;
 using namespace vznncv;
 
 //--------------------------------
@@ -182,7 +180,7 @@ static void test_file_operations()
 
     // create simple file
     test_trace_memory_reset();
-    join_paths(path_buf, BD_ROOT_DIR, "file.bin");
+    sprintf(path_buf, "/%s/%s", BD_ROOT_DIR, "file.bin");
     f = open(path_buf, WB_FLAG);
     ASSERT_GTE_ZERO(f);
     res = write(f, text, strlen(text));
@@ -217,7 +215,7 @@ static void test_file_limit()
     int name_cnt = 0;
     auto build_file_path = [&]() {
         sprintf(filename_buf, "file_%i", name_cnt++);
-        join_paths(path_buf, BD_ROOT_DIR, filename_buf);
+        sprintf(path_buf, "/%s/%s", BD_ROOT_DIR, filename_buf);
         return path_buf;
     };
 
@@ -279,13 +277,13 @@ static void test_directory_operations()
 
     // create test directory and fill it
     test_trace_memory_reset();
-    join_paths(basepath_buf, BD_ROOT_DIR, "test_dir");
+    sprintf(basepath_buf, "/%s/%s", BD_ROOT_DIR, "test_dir");
     ASSERT_SUCCESS(mkdir(basepath_buf, 0777));
     // add subdirectory
-    join_paths(path_buf, basepath_buf, "subdir");
+    sprintf(path_buf, "%s/%s", basepath_buf, "subdir");
     ASSERT_SUCCESS(mkdir(path_buf, 0777));
     // add file
-    join_paths(path_buf, basepath_buf, "file.bin");
+    sprintf(path_buf, "%s/%s", basepath_buf, "file.bin");
     f = open(path_buf, WB_FLAG);
     ASSERT_GTE_ZERO(f);
     res = write(f, "123", 3);
@@ -332,7 +330,7 @@ static void test_directory_limit()
     int err;
     auto build_dir_path = [&](int i) {
         sprintf(basepath_buf, "dir_%i", i++);
-        join_paths(path_buf, BD_ROOT_DIR, basepath_buf);
+        sprintf(path_buf, "/%s/%s", BD_ROOT_DIR, basepath_buf);
         return path_buf;
     };
 
@@ -343,12 +341,12 @@ static void test_directory_limit()
             return err;
         }
         char sub_path[64];
-        join_paths(sub_path, path, "subdir");
+        sprintf(sub_path, "%s/%s", path, "subdir");
         err = mkdir(sub_path, 0777);
         if (err) {
             return err;
         }
-        join_paths(sub_path, path, "test_file");
+        sprintf(sub_path, "%s/%s", path, "test_file");
         int f = open(sub_path, WB_FLAG);
         write(f, "abc", 3);
         err = close(f);
