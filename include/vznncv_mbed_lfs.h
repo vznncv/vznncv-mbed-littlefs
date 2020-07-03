@@ -34,6 +34,8 @@ protected:
     const vznncv_lfs_size_t _default_cache_size;
     const vznncv_lfs_size_t _default_lookahead_size;
 
+    const vznncv_lfs_size_t _commit_compact_threshold;
+
     // maximal number of opened files/directories
     const size_t _max_file_num = 0;
     const size_t _max_dir_num = 0;
@@ -146,6 +148,8 @@ public:
      *  @param block_cycles number of erase cycles before a block is forcefully evicted
      *  @param cache_size size of read/program caches
      *  @param lookahead_size size of the lookahead buffer
+     *  @param commit_compact_threshold maximal directory commit number after that compact operations will be triggered forcibly.
+     *         To use this option the "vznncv-mbed-littelfs.enable_commit_compact_threshold" option should be enabled.
      */
     FMLittleFileSystem2(const char *name = NULL,
         size_t max_file_num = 1,
@@ -153,7 +157,8 @@ public:
         vznncv_lfs_size_t block_size = MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_BLOCK_SIZE,
         uint32_t block_cycles = MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_BLOCK_CYCLES,
         vznncv_lfs_size_t cache_size = MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_CACHE_SIZE,
-        vznncv_lfs_size_t lookahead = MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_LOOKAHEAD_SIZE);
+        vznncv_lfs_size_t lookahead = MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_LOOKAHEAD_SIZE,
+        vznncv_lfs_size_t commit_compact_threshold = 0);
 
     virtual ~FMLittleFileSystem2();
 
@@ -196,7 +201,8 @@ private:
         vznncv_lfs_size_t block_size,
         uint32_t block_cycles,
         vznncv_lfs_size_t cache_size,
-        vznncv_lfs_size_t lookahead_size);
+        vznncv_lfs_size_t lookahead_size,
+        vznncv_lfs_size_t commit_compact_threshold);
 
     //
     // FileSystem methods implementation

@@ -240,6 +240,15 @@ struct vznncv_lfs_config {
     // larger attributes size but must be <= VZNNCV_LFS_ATTR_MAX. Defaults to
     // VZNNCV_LFS_ATTR_MAX when zero.
     vznncv_lfs_size_t attr_max;
+
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+    // Optional number of maximal directory commits before "compact" operations.
+    // If value is zero, then it isn't used.
+    // If value is greater than zero, then compact operation will be invoked event current metadata
+    // block have space for a new commit. It causes inefficient space usage, but may improve
+    // performance with large blocks.
+    vznncv_lfs_size_t commit_compact_threshold;
+#endif
 };
 
 // File info structure
@@ -309,6 +318,9 @@ typedef struct vznncv_lfs_mdir {
     vznncv_lfs_off_t off;
     uint32_t etag;
     uint16_t count;
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+    uint16_t commit_count;
+#endif
     bool erased;
     bool split;
     vznncv_lfs_block_t tail[2];

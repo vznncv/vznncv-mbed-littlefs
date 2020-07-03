@@ -235,17 +235,37 @@ static void test_lfs_logs_overdead()
 
     size_t read_size_before_changes;
     size_t read_size_after_changnes;
+    int logs_grow_overhead;
 
-    // prepare file system
-    auto fs = make_unique<FMLittleFileSystem2>(BD_ROOT_DIR, 2, 2, lfs_block_size);
+    // check usage without commit threshold
+    {
+        // prepare file system
+        auto fs = make_unique<FMLittleFileSystem2>(BD_ROOT_DIR, 2, 2, lfs_block_size);
 
-    // measure performance
-    err = measure_bd_usage_after_dummy_operations(fs.get(), test_file_size, dummy_file_op_num, &read_size_before_changes, &read_size_after_changnes);
-    ASSERT_SUCCESS(err);
+        // measure performance
+        err = measure_bd_usage_after_dummy_operations(fs.get(), test_file_size, dummy_file_op_num, &read_size_before_changes, &read_size_after_changnes);
+        ASSERT_SUCCESS(err);
 
-    int logs_grow_overhead = (int)read_size_after_changnes - (int)read_size_before_changes;
+        logs_grow_overhead = (int)read_size_after_changnes - (int)read_size_before_changes;
+        TEST_ASSERT(logs_grow_overhead > 2 * BD_BLOCK_SIZE);
+    }
 
-    TEST_ASSERT(logs_grow_overhead < 2 * BD_BLOCK_SIZE);
+    // check usage with commit threshold
+    {
+        // prepare file system
+        auto fs = make_unique<FMLittleFileSystem2>(BD_ROOT_DIR, 2, 2, lfs_block_size,
+            MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_BLOCK_CYCLES, // block_cycles
+            MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_CACHE_SIZE, // cache_size
+            MBED_CONF_VZNNCV_MBED_LITTELFS_DEFAULT_LOOKAHEAD_SIZE, // lookahead
+            2); // commit_compact_threshold
+
+        // measure performance
+        err = measure_bd_usage_after_dummy_operations(fs.get(), test_file_size, dummy_file_op_num, &read_size_before_changes, &read_size_after_changnes);
+        ASSERT_SUCCESS(err);
+
+        logs_grow_overhead = (int)read_size_after_changnes - (int)read_size_before_changes;
+        TEST_ASSERT(logs_grow_overhead < 2 * BD_BLOCK_SIZE);
+    }
 }
 
 // test cases description

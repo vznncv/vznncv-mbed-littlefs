@@ -291,6 +291,11 @@ generate-patches)
     lfs_create_patch "$LITTLEFS_PREFIX_SOURCE_DIR" "$LITTLEFS_PATCHED_SOURCE_DIR" "$LITTLEFS_PATCHES_SOURCE_DIR" "$(join_by "|" "${LITTLEFS_PROCESS_PATCH_FILES[@]}")"
     log_info "Complete"
     ;;
+-h|--help)
+    log "Usage"
+    log "$0 {generate-sources|generate-patches}"
+    exit 0
+    ;;
 *)
     log_error "Unknown command: $command"
     ;;

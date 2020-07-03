@@ -7,4 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+- Update "littlefs" code and add `enable_commit_compact_threshold` option that triggers
+  directory logs rebuilding to merge log commits. It reduces efficiency of storage usage,
+  but increases performance with large blocks.
 - Add littlefs wrapper with fixed memory consumption for mbed-os.

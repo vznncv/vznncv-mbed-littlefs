@@ -10,13 +10,16 @@ namespace vznncv {
 
 typedef lock_guard<PlatformMutex> mbed_lock_guard;
 
-FMLittleFileSystem2::FMLittleFileSystem2(const char *name, size_t max_file_num, size_t max_dir_num, vznncv_lfs_size_t block_size, uint32_t block_cycles, vznncv_lfs_size_t cache_size, vznncv_lfs_size_t lookahead)
+FMLittleFileSystem2::FMLittleFileSystem2(const char *name, size_t max_file_num, size_t max_dir_num, vznncv_lfs_size_t block_size, uint32_t block_cycles, vznncv_lfs_size_t cache_size, vznncv_lfs_size_t lookahead, vznncv_lfs_size_t commit_compact_threshold)
     : FileSystem(name)
 
     , _default_block_size(block_size)
     , _default_block_cycles(block_cycles)
     , _default_cache_size(cache_size)
     , _default_lookahead_size(lookahead)
+
+    , _commit_compact_threshold(commit_compact_threshold)
+
     , _max_file_num(max_file_num)
     , _max_dir_num(max_dir_num)
 
@@ -242,7 +245,7 @@ int FMLittleFileSystem2::_format_impl(BlockDevice *bd, vznncv_lfs_size_t block_s
     }
 
     // note: the method is invoked inside "reformat", when current system is unmounted, so we can reuse files "_fs" and "_config"
-    _init_lfs_config(bd, &_config, block_size, block_cycles, cache_size, lookahead_size);
+    _init_lfs_config(bd, &_config, block_size, block_cycles, cache_size, lookahead_size, _commit_compact_threshold);
 
     err = vznncv_lfs_format(&_lfs, &_config);
     if (err) {
@@ -262,7 +265,8 @@ int FMLittleFileSystem2::_init_lfs_config(
     vznncv_lfs_size_t block_size,
     uint32_t block_cycles,
     vznncv_lfs_size_t cache_size,
-    vznncv_lfs_size_t lookahead_size)
+    vznncv_lfs_size_t lookahead_size,
+    vznncv_lfs_size_t commit_compact_threshold)
 {
     memset(config, 0, sizeof(vznncv_lfs_config));
     config->context = bd;
@@ -277,6 +281,7 @@ int FMLittleFileSystem2::_init_lfs_config(
     config->block_cycles = block_cycles;
     config->cache_size = vznncv_lfs_max(cache_size, config->prog_size);
     config->lookahead_size = vznncv_lfs_min(lookahead_size, 8 * ((config->block_count + 63) / 64));
+    config->commit_compact_threshold = commit_compact_threshold;
     return 0;
 }
 
@@ -297,7 +302,7 @@ int FMLittleFileSystem2::mount(BlockDevice *bd)
 
     // mount file system
     // note: vznncv_lfs_mount can cause some memory allocations
-    _init_lfs_config(bd, &_config, _default_block_size, _default_block_cycles, _default_cache_size, _default_lookahead_size);
+    _init_lfs_config(bd, &_config, _default_block_size, _default_block_cycles, _default_cache_size, _default_lookahead_size, _commit_compact_threshold);
     err = vznncv_lfs_mount(&_lfs, &_config);
     if (err) {
         _bd = nullptr;

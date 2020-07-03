@@ -807,6 +807,9 @@ static vznncv_lfs_stag_t vznncv_lfs_dir_fetchmatch(vznncv_lfs_t *vznncv_lfs,
         vznncv_lfs_tag_t ptag = 0xffffffff;
 
         uint16_t tempcount = 0;
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+        uint16_t temp_commit_count = 0;
+#endif
         vznncv_lfs_block_t temptail[2] = {VZNNCV_LFS_BLOCK_NULL, VZNNCV_LFS_BLOCK_NULL};
         bool tempsplit = false;
         vznncv_lfs_stag_t tempbesttag = besttag;
@@ -881,6 +884,12 @@ static vznncv_lfs_stag_t vznncv_lfs_dir_fetchmatch(vznncv_lfs_t *vznncv_lfs,
                 dir->tail[0] = temptail[0];
                 dir->tail[1] = temptail[1];
                 dir->split = tempsplit;
+
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+                // update commit count
+                temp_commit_count++;
+                dir->commit_count = temp_commit_count;
+#endif
 
                 // reset crc
                 crc = 0xffffffff;
@@ -1382,6 +1391,9 @@ static int vznncv_lfs_dir_alloc(vznncv_lfs_t *vznncv_lfs, vznncv_lfs_mdir_t *dir
     dir->off = sizeof(dir->rev);
     dir->etag = 0xffffffff;
     dir->count = 0;
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+    dir->commit_count = 0;
+#endif
     dir->tail[0] = VZNNCV_LFS_BLOCK_NULL;
     dir->tail[1] = VZNNCV_LFS_BLOCK_NULL;
     dir->erased = false;
@@ -1669,6 +1681,9 @@ static int vznncv_lfs_dir_compact(vznncv_lfs_t *vznncv_lfs,
             dir->count = end - begin;
             dir->off = commit.off;
             dir->etag = commit.ptag;
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+            dir->commit_count = 1;
+#endif
             // update gstate
             vznncv_lfs->gdelta = (vznncv_lfs_gstate_t){0};
             if (!relocated) {
@@ -1773,6 +1788,11 @@ static int vznncv_lfs_dir_commit(vznncv_lfs_t *vznncv_lfs, vznncv_lfs_mdir_t *di
     }
 
     if (dir->erased || dir->count >= 0xff) {
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+        if (vznncv_lfs->cfg->commit_compact_threshold && dir->commit_count >= vznncv_lfs->cfg->commit_compact_threshold) {
+            goto compact;
+        }
+#endif
         // try to commit
         struct vznncv_lfs_commit commit = {
             .block = dir->pair[0],
@@ -1840,6 +1860,9 @@ static int vznncv_lfs_dir_commit(vznncv_lfs_t *vznncv_lfs, vznncv_lfs_mdir_t *di
         VZNNCV_LFS_ASSERT(commit.off % vznncv_lfs->cfg->prog_size == 0);
         dir->off = commit.off;
         dir->etag = commit.ptag;
+#ifdef MBED_CONF_VZNNCV_MBED_LITTELFS_ENABLE_COMMIT_COMPACT_THRESHOLD
+        dir->commit_count += 1;
+#endif
         // and update gstate
         vznncv_lfs->gdisk = vznncv_lfs->gstate;
         vznncv_lfs->gdelta = (vznncv_lfs_gstate_t){0};

@@ -24,6 +24,10 @@
             "value": true,
             "help": "Enable intrinsics for bit operations such as ctz, popc, and le32 conversion. Can be disabled to help debug toolchain issues"
         },
+        "enable_commit_compact_threshold": {
+            "value": true,
+            "help": "Enable code that triggers directory compact operation after specified commit threshold. This option increase block device wearing, but speeds up file system with large blocks (4 KB or more)"
+        },
         "use_mbed_trace": {
             "value": true,
             "help": "Use mbed_trace module for log messages if it's true, otherwise use fprintf"
