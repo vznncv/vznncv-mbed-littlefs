@@ -9,9 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "cmsis_compiler.h"
-#include "mbed_assert.h"
-
 #if MBED_CONF_VZNNCV_MBED_LITTELFS_USE_MBED_TRACE
 #include "mbed_trace.h"
 #define TRACE_GROUP "vzlf"
@@ -20,6 +17,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "cmsis_compiler.h"
+#include "mbed_assert.h"
 
 // Macros, may be replaced by system specific wrappers. Arguments to these
 // macros must not have side-effects as the macros can be removed for a smaller

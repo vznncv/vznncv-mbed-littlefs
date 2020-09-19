@@ -118,28 +118,6 @@ static void app_test_teardown_handler(const size_t passed, const size_t failed, 
 }
 
 //--------------------------------
-// helper unity shortcuts
-//--------------------------------
-
-#define ASSERT_SUCCESS(expr)                                                             \
-    do {                                                                                 \
-        int err = expr;                                                                  \
-        UNITY_TEST_ASSERT(!err, __LINE__, " Expression " #expr " is evaluated to false") \
-        if (err) {                                                                       \
-            return;                                                                      \
-        }                                                                                \
-    } while (0);
-
-#define ASSERT_GTE_ZERO(expr)                                                                      \
-    do {                                                                                           \
-        int err = expr;                                                                            \
-        UNITY_TEST_ASSERT(err >= 0, __LINE__, " Expression " #expr " is evaluated to as negative") \
-        if (err < 0) {                                                                             \
-            return;                                                                                \
-        }                                                                                          \
-    } while (0);
-
-//--------------------------------
 // test functions
 //--------------------------------
 
@@ -154,7 +132,6 @@ static int measure_bd_usage_after_dummy_operations(FileSystem *fs, const size_t 
 {
     int err;
     int res;
-    int f;
 
     // clear and format block device
     clear_block_devices();
@@ -197,7 +174,7 @@ static int measure_bd_usage_after_dummy_operations(FileSystem *fs, const size_t 
     *read_size_before_changes = prof_bd.get_read_count();
 
     // write/delete dummy file
-    for (int i = 0; i < dummy_file_op_num; i++) {
+    for (size_t i = 0; i < dummy_file_op_num; i++) {
         // create temporary files
         res = write_test_data(tempfile_buf.get(), write_content_buf.get(), test_file_size);
         if (res != test_file_size) {
@@ -244,7 +221,7 @@ static void test_lfs_logs_overdead()
 
         // measure performance
         err = measure_bd_usage_after_dummy_operations(fs.get(), test_file_size, dummy_file_op_num, &read_size_before_changes, &read_size_after_changnes);
-        ASSERT_SUCCESS(err);
+        TEST_ASSERT_EQUAL(0, err);
 
         logs_grow_overhead = (int)read_size_after_changnes - (int)read_size_before_changes;
         TEST_ASSERT(logs_grow_overhead > 2 * BD_BLOCK_SIZE);
@@ -261,7 +238,7 @@ static void test_lfs_logs_overdead()
 
         // measure performance
         err = measure_bd_usage_after_dummy_operations(fs.get(), test_file_size, dummy_file_op_num, &read_size_before_changes, &read_size_after_changnes);
-        ASSERT_SUCCESS(err);
+        TEST_ASSERT_EQUAL(0, err);
 
         logs_grow_overhead = (int)read_size_after_changnes - (int)read_size_before_changes;
         TEST_ASSERT(logs_grow_overhead < 2 * BD_BLOCK_SIZE);

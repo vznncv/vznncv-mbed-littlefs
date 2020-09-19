@@ -70,7 +70,6 @@ public:
  */
 static void test_simple_usage()
 {
-    const size_t obj_size = sizeof(DemoObj<>);
     const size_t num_obj = 10;
     DemoObj<> *obj;
     DemoObj<> *obj_mem;
@@ -100,7 +99,7 @@ static int next_rand(int *state)
 template <typename T>
 static void shuffle_array(T **array, size_t size, int *state)
 {
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         int i1 = next_rand(state) % size;
         int i2 = next_rand(state) % size;
         T *elem = array[i1];

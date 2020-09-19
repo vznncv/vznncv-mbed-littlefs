@@ -94,6 +94,7 @@ static int test_trace_memory_init()
     static_assert(MBED_MEM_TRACING_ENABLED, "Mbed memory tracing isn't enabled");
     mbed_mem_trace_set_callback(test_trace_memory_cb);
     test_trace_memory_reset();
+    return 0;
 }
 
 //--------------------------------
@@ -164,11 +165,11 @@ static int clean_test_bufs()
     memset(basepath_buf, 0, sizeof(basepath_buf));
     memset(content_buf, 0, sizeof(content_buf));
     memset(filename_buf, 0, sizeof(filename_buf));
+    return 0;
 }
 
 static void test_file_operations()
 {
-    int err;
     const char *text = "abc123";
     ssize_t res;
     int f;
@@ -327,7 +328,6 @@ static void test_directory_operations()
 
 static void test_directory_limit()
 {
-    int err;
     auto build_dir_path = [&](int i) {
         sprintf(basepath_buf, "dir_%i", i++);
         sprintf(path_buf, "/%s/%s", BD_ROOT_DIR, basepath_buf);
